@@ -25,7 +25,7 @@ jobs:
     - name: Install app dependencies
       working-directory: 3rdparty
       run: |
-        call install_app_files.bat ${{ secrets.BKNIGHT_GITHUB_PAT }}
+        call .\install_app_files.bat ${{ secrets.BKNIGHT_GITHUB_PAT }}
     - name: Lint with flake8
       working-directory: i3drsgm
       run: |
