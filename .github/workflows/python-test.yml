@@ -33,10 +33,6 @@ jobs:
       working-directory: 3rdparty
       run: |
         & .\install_app_files.bat ${{ secrets.BKNIGHT_GITHUB_PAT }}
-    - uses: actions/upload-artifact@v2       
-      with:
-        name: i3drsgm-deps-artifact${{ matrix.python-version }}
-        path: i3drsgm/i3drsgm/app
     - name: Test with pytest
       working-directory: i3drsgm
       run: |
