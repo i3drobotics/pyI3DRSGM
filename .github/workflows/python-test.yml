@@ -32,7 +32,7 @@ jobs:
     - name: Install app dependencies
       working-directory: 3rdparty
       run: |
-        Start-Process .\install_app_files.bat ${{ secrets.BKNIGHT_GITHUB_PAT }}
+        & .\install_app_files.bat ${{ secrets.BKNIGHT_GITHUB_PAT }}
     - name: Test with pytest
       working-directory: 3rdparty
       run: |
