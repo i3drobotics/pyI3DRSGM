@@ -1,9 +1,10 @@
 """Setup module to build i3drsgm module"""
-from os.path import abspath, dirname, join, normpath, relpath
+from os.path import abspath, dirname, join, normpath, relpath, realpath
 from shutil import rmtree
 import glob
 import setuptools
 from setuptools import Command
+from setuptools.command.install import install
 
 with open("../README.md", "r") as fh:
     long_description = fh.read()
@@ -55,6 +56,7 @@ setuptools.setup(
     url="https://github.com/i3drobotics/pyi3drsgm",
     packages=setuptools.find_packages(),
     package_dir={'i3drsgm':'i3drsgm'},
+    include_package_data=True,
     install_requires=[
         'numpy; python_version == "3.5"','numpy==1.19.3; python_version > "3.5"',
         'opencv-python','stereo3d'
@@ -66,6 +68,6 @@ setuptools.setup(
     ],
     python_requires='>=3.6',
     cmdclass={
-        'clean': CleanCommand,
+        'clean': CleanCommand
     }
 )
