@@ -27,18 +27,18 @@ jobs:
       run: |
         install_app_files.bat ${{ secrets.BKNIGHT_GITHUB_PAT }}
     - name: Build
-      working-directory: pyi3drsgm
+      working-directory: i3drsgm
       run: |
         python setup.py sdist bdist_wheel --plat-name=win-amd64
     - name: Publish to Test Pip
-      working-directory: pyi3drsgm
+      working-directory: i3drsgm
       env:
         TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
         TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
       run: |
         twine upload --repository-url https://test.pypi.org/legacy/ dist/*
     - name: Publish to Pip
-      working-directory: pyi3drsgm
+      working-directory: i3drsgm
       env:
         TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
         TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
