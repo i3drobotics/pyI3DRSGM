@@ -6,6 +6,7 @@ This module is for using I3DR Semi-Global Matcher in Python.
 import os
 import subprocess
 import math
+import glob
 import shutil
 import numpy as np
 import scipy
@@ -260,7 +261,7 @@ class I3DRSGMAppAPI:
                 print("license file does not exist")
                 self.init_success = False
                 return
-
+        print(glob.glob(os.path.join(I3RSGMApp_folder,"*")))
         # Start I3DRSGMApp with API argument
         self.appProcess = subprocess.Popen([self.I3DRSGMApp, "api"], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         self.init_success = True
