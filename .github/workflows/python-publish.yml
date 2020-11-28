@@ -25,8 +25,7 @@ jobs:
     - name: Install app dependencies
       working-directory: 3rdparty
       run: |
-        call .\install_app_files.bat ${{ secrets.BKNIGHT_GITHUB_PAT }}
-      shell: cmd
+        Start-Process .\install_app_files.bat ${{ secrets.BKNIGHT_GITHUB_PAT }}
     - name: Build
       working-directory: i3drsgm
       run: |
