@@ -2,12 +2,16 @@
 import os
 import cv2
 from Stereo3D import StereoCalibration
+import i3drsgm
 from i3drsgm import I3DRSGM, StereoSupport
 
 if __name__ == "__main__":
     # Get folder containing current script
-    #script_folder = os.path.dirname(os.path.realpath(__file__))
-    resource_folder = os.path.join("C:\\Code\\I3DR\\pyi3drsgm\\sample_data")
+    i3drsgm_folder = os.path.dirname(i3drsgm.__file__)
+    app_folder = os.path.join(i3drsgm_folder,"app")
+    tmp_folder = os.path.join(i3drsgm_folder,"tmp")
+    script_folder = os.path.dirname(os.path.realpath(__file__))
+    resource_folder = os.path.join(script_folder,os.path.normpath("../sample_data"))
 
     # Load stereo calibration from yamls
     left_cal_file = os.path.join(resource_folder,"sim_left.yaml")
@@ -17,8 +21,8 @@ if __name__ == "__main__":
 
     # Initalise I3DRSGM
     print("Intitalising I3DRSGM...")
-    i3drsgm = I3DRSGM(I3RSGMApp_folder="C:\\Code\\I3DR\\pyi3drsgm\\3rdparty\\i3drsgm")
-    if (i3drsgm.isInit()):
+    i3drsgm = I3DRSGM(tmp_folder,app_folder)
+    if i3drsgm.isInit():
         # Load images from file
         left_img = cv2.imread(os.path.join(resource_folder,"sim_left.png"))
         right_img = cv2.imread(os.path.join(resource_folder,"sim_right.png"))
@@ -33,8 +37,7 @@ if __name__ == "__main__":
         i3drsgm.setDisparityRange(3264)
         i3drsgm.enableInterpolation(False)
 
-        valid = True
-        while(valid):
+        while(True):
             # Rectify stereo image pair
             left_rect_img, right_rect_img = stcal.rectify_pair(left_gray_img,right_gray_img)
             # Stereo match image pair
@@ -60,6 +63,8 @@ if __name__ == "__main__":
                 print("Press any key on image window to close")
                 cv2.waitKey(0)
                 break # We only want to run this once for our purposes but can remove this to run continously
+            else:
+                break
 
         # Important to close I3DRSGM to clean up memory
         # If program crashes before this has been called then you may need to restart the terminal to clean up memory
