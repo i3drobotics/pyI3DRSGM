@@ -64,7 +64,7 @@ setuptools.setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: Microsoft :: Windows",
     ],
-    python_requires='>=3.5',
+    python_requires='>=3.6',
     cmdclass={
         'clean': CleanCommand,
     }
