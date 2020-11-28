@@ -22,11 +22,6 @@ jobs:
         python -m pip install --upgrade pip
         pip install flake8 pytest
         pip install -r requirements.txt
-    - name: Install app dependencies
-      working-directory: 3rdparty
-      run: |
-        call .\install_app_files.bat ${{ secrets.BKNIGHT_GITHUB_PAT }}
-      shell: cmd
     - name: Lint with flake8
       working-directory: i3drsgm
       run: |
@@ -35,6 +30,9 @@ jobs:
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Test with pytest
-      working-directory: i3drsgm
+      working-directory: 3rdparty
       run: |
+        call .\install_app_files.bat ${{ secrets.BKNIGHT_GITHUB_PAT }}
+        cd ..\i3drsgm
         pytest
+      shell: cmd
