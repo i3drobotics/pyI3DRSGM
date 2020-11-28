@@ -240,6 +240,13 @@ class I3DRSGMAppAPI:
         else:
             self.I3DRSGMApp = os.path.join(I3RSGMApp_folder,"I3DRSGMApp.exe")
 
+        if not os.path.exists(self.I3DRSGMApp):
+            files_in_folder = glob.glob(os.path.join(I3RSGMApp_folder,"*"))
+            files_in_folder_str = ""
+            for files_names in files_in_folder:
+                files_in_folder_str += files_names
+            raise Exception("I3DRSGMApp does not exists: "+files_in_folder_str)
+
         # Define output folder used for storing images while processing
         if (output_folder == None):
             script_folder = os.path.dirname(os.path.realpath(__file__))
@@ -261,7 +268,7 @@ class I3DRSGMAppAPI:
                 print("license file does not exist")
                 self.init_success = False
                 return
-        print(glob.glob(os.path.join(I3RSGMApp_folder,"*")))
+
         # Start I3DRSGMApp with API argument
         self.appProcess = subprocess.Popen([self.I3DRSGMApp, "api"], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         self.init_success = True
