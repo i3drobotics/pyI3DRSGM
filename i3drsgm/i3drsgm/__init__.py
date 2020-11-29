@@ -14,7 +14,7 @@ import cv2
 import wget
 import zipfile
 import sys
-from Stereo3D import StereoCalibration
+from stereo3d import StereoCalibration
 
 # Exceptions
 '''
