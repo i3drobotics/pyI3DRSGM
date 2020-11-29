@@ -1,13 +1,11 @@
 """Setup module to build i3drsgm module"""
-from os.path import abspath, dirname, join, normpath, relpath, realpath
+from os.path import abspath, dirname, join, normpath, relpath
 from shutil import rmtree
 import glob
-import setuptools
-from setuptools import Command
-from setuptools.command.install import install
-
-with open("../README.md", "r") as fh:
-    long_description = fh.read()
+import sys
+import argparse
+from i3drsgm import I3DRSGMAppAPI
+from setuptools import Command, setup, find_packages
 
 class CleanCommand(Command):
     """Custom clean command to tidy up the project root."""
@@ -45,21 +43,53 @@ class CleanCommand(Command):
                 print('removing %s' % relpath(path))
                 rmtree(path)
 
-setuptools.setup(
+with open("../README.md", "r") as fh:
+    long_description = fh.read()
+
+def str2bool(v):
+    if isinstance(v, bool):
+       return v
+    if v.lower() in ('yes', 'true', 't', 'y', '1'):
+        return True
+    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
+        return False
+    else:
+        raise argparse.ArgumentTypeError('Boolean value expected.')
+
+
+# Get custom command line options
+# TODO: replace this with setuptools cmdclass
+# (can't work out how to change setuptools.setup arguments from a cmdclass)
+argparser = argparse.ArgumentParser(add_help=False)
+argparser.add_argument('--offline-installer', type=str2bool, default=False,
+                        help='required foo argument', required=False)
+args, unknown = argparser.parse_known_args()
+sys.argv = [sys.argv[0]] + unknown
+
+# Define custom options
+OFFLINE_INSTALLER = args.offline_installer
+
+if OFFLINE_INSTALLER:
+    INCLUDE_PACKAGE_DATA = True
+    I3DRSGMAppAPI.download_app()
+else:
+    INCLUDE_PACKAGE_DATA = False
+
+setup(
     name="i3drsgm",
-    version="1.0.6",
+    version="1.0.6.1",
     author="Ben Knight",
     author_email="bknight@i3drobotics.com",
     description="Python wrapper for I3DR Semi-Global Matcher",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/i3drobotics/pyi3drsgm",
-    packages=setuptools.find_packages(),
+    packages=find_packages(),
     package_dir={'i3drsgm':'i3drsgm'},
-    include_package_data=True,
+    include_package_data=INCLUDE_PACKAGE_DATA,
     install_requires=[
         'numpy; python_version == "3.5"','numpy==1.19.3; python_version > "3.5"',
-        'opencv-python','stereo3d'
+        'opencv-python','stereo3d',"wget"
     ],
     classifiers=[
         "Programming Language :: Python :: 3",
@@ -67,7 +97,5 @@ setuptools.setup(
         "Operating System :: Microsoft :: Windows",
     ],
     python_requires='>=3.6',
-    cmdclass={
-        'clean': CleanCommand
-    }
+    cmdclass={'clean': CleanCommand }
 )

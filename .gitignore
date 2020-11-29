@@ -1,10 +1,4 @@
-/datasets
 *.vscode
-/samples/datasets
-/stereomideval/datasets
-/stereomideval/stereomideval/datasets
-/3rdparty/i3drsgm/i3drsgm
-/3rdparty/i3drsgm/token.txt
 /i3drsgm/i3drsgm/tmp
-/3rdparty/token.txt
-/i3drsgm/i3drsgm/app
+/i3drsgm/i3drsgm/i3drsgm_app
+/i3drsgm/i3drsgm-*

@@ -11,6 +11,9 @@ import shutil
 import numpy as np
 import scipy
 import cv2
+import wget
+import zipfile
+import sys
 from Stereo3D import StereoCalibration
 
 # Exceptions
@@ -224,7 +227,7 @@ class StereoSupport:
         return disp_colormap
 
 class I3DRSGMAppAPI:
-    def __init__(self, output_folder=None, I3RSGMApp_folder=None, license_file=None):
+    def __init__(self, license_file=None):
         # Initialise I3DRSGM App API
         # Get folder containing current script
         script_folder = os.path.dirname(os.path.realpath(__file__))
@@ -234,26 +237,29 @@ class I3DRSGMAppAPI:
         self.PARAM_DISPARITY_RANGE = "SET_DISPARITY_RANGE"
         self.PARAM_INTERPOLATION = "SET_INTERPOLATION"
 
-        # Define location of I3DRSGM app
-        if (I3RSGMApp_folder == None):
-            self.I3DRSGMApp = os.path.join(script_folder,'../I3DRSGMApp.exe')
-        else:
-            self.I3DRSGMApp = os.path.join(I3RSGMApp_folder,"I3DRSGMApp.exe")
-
-        if not os.path.exists(self.I3DRSGMApp):
-            files_in_folder = glob.glob(os.path.join(I3RSGMApp_folder,"*"))
-            files_in_folder_str = ""
-            for files_names in files_in_folder:
-                files_in_folder_str += files_names
-            raise Exception("I3DRSGMApp does not exists: "+files_in_folder_str)
+        # Check for valid I3DRSGMApp install
+        valid_i3drsgm_app = False
+        i3drsgm_app_folder = os.path.join(script_folder,"i3drsgm_app")
+        self.I3DRSGMApp = os.path.join(i3drsgm_app_folder,"I3DRSGMApp.exe")
+        # Check if I3DRSGMApp folder exists
+        if os.path.exists(i3drsgm_app_folder):
+            if os.path.exists(i3drsgm_app_folder):
+                # TODO: check all dlls are present
+                valid_i3drsgm_app = True
+        
+        if not valid_i3drsgm_app:
+            msg = "Failed to find I3DRSGMApp in python install. "
+            msg += "You must be running the online wheel. "
+            msg += "Downloading the required files..."
+            print(msg)
+            self.download_app()
 
         # Define output folder used for storing images while processing
-        if (output_folder == None):
-            script_folder = os.path.dirname(os.path.realpath(__file__))
-            output_folder = os.path.join(script_folder,'tmp')
-        if not os.path.exists(output_folder):
-                os.makedirs(os.path.join(output_folder))
-        self.output_folder = output_folder
+        script_folder = os.path.dirname(os.path.realpath(__file__))
+        tmp_folder = os.path.join(script_folder,'tmp')
+        if not os.path.exists(tmp_folder):
+                os.makedirs(os.path.join(tmp_folder))
+        self.tmp_folder = tmp_folder
 
         # Copy license file to I3DRSGM path
         if license_file is not None:
@@ -278,6 +284,58 @@ class I3DRSGMAppAPI:
             print("Failed to initalise I3DRSGM: "+response)
             self.close()
         self.init_success = valid
+
+    @staticmethod
+    def download_app(i3drsgm_app_version="1.0.6",replace=False):
+        def bar_progress(current, total, *_):
+            """
+            Progress bar to display download progress in wget
+
+            Parameters:
+                current (int): current byte count
+                total (int): total number of bytes
+                *_: required by wget but is ignored in this function
+            """
+            base_progress_msg = "Downloading: %d%% [%d / %d] bytes"
+            progress_message = base_progress_msg % (current / total * 100, current, total)
+            # Don't use print() as it will print in new line every time.
+            sys.stdout.write("\r" + progress_message)
+            sys.stdout.flush()
+
+        def download_from_release(i3drsgm_app_version):
+            script_folder = os.path.dirname(os.path.realpath(__file__))
+            zip_filepath = os.path.join(script_folder,"i3drsgm-app.zip")
+
+            base_url = "https://github.com/i3drobotics/i3drsgm/releases/download/"
+            release_url = "v{}/i3drsgm-{}-app.zip".format(i3drsgm_app_version,i3drsgm_app_version)
+            url = base_url+release_url
+
+            wget.download(url, zip_filepath, bar=bar_progress)
+            # unzip downloaded file
+            with zipfile.ZipFile(zip_filepath,"r") as zip_ref:
+                zip_ref.extractall(script_folder)
+            # removing zip file
+            os.remove(zip_filepath)
+
+        script_folder = os.path.dirname(os.path.realpath(__file__))
+
+        # Check for I3DRSGMApp already exists
+        i3drsgm_app_exists = False
+        i3drsgm_app_folder = os.path.join(script_folder,"i3drsgm_app")
+        i3drsgm_app = os.path.join(i3drsgm_app_folder,"I3DRSGMApp.exe")
+        # Check if I3DRSGMApp folder exists
+        if os.path.exists(i3drsgm_app_folder):
+            if os.path.exists(i3drsgm_app):
+                # TODO: check all dlls are present
+                i3drsgm_app_exists = True
+
+        if not i3drsgm_app_exists:
+            download_from_release(i3drsgm_app_version)
+        else:
+            if replace:
+                os.remove(i3drsgm_app_folder)
+                download_from_release(i3drsgm_app_version)
+
 
     def isInit(self):
         # Check if class was initalised successfully
@@ -334,9 +392,9 @@ class I3DRSGMAppAPI:
         # Stereo match from left and right image filepaths
         if (self.init_success):
             if (left_cal_filepath == None or right_cal_filepath == None):
-                appOptions="FORWARD_MATCH,"+left_filepath+","+right_filepath+","+self.output_folder
+                appOptions="FORWARD_MATCH,"+left_filepath+","+right_filepath+","+self.tmp_folder
             else:
-                appOptions="FORWARD_MATCH,"+left_filepath+","+right_filepath+","+left_cal_filepath+","+right_cal_filepath+","+self.output_folder+",0"
+                appOptions="FORWARD_MATCH,"+left_filepath+","+right_filepath+","+left_cal_filepath+","+right_cal_filepath+","+self.tmp_folder+",0"
             valid,response = self.apiRequest(appOptions)
             if (not valid):
                 print(response)
@@ -363,10 +421,10 @@ class I3DRSGMAppAPI:
         self.appProcess.terminate()
 
 class I3DRSGM:
-    def __init__(self, tmp_folder=None, I3RSGMApp_folder=None, license_file=None):
+    def __init__(self, license_file=None):
         # Initalse I3DRSGM
         # Initalise connection to I3DRSGM app API
-        self.i3drsgmAppAPI = I3DRSGMAppAPI(tmp_folder, I3RSGMApp_folder, license_file)
+        self.i3drsgmAppAPI = I3DRSGMAppAPI(license_file)
 
     def isInit(self):
         # Check I3DRSGM has been initalised
@@ -375,9 +433,9 @@ class I3DRSGM:
     def forwardMatch(self, left_img, right_img):
         # Stereo matching using a left and right image (expects images to already by rectified)
         if (self.isInit()):
-            left_filepath=os.path.join(self.i3drsgmAppAPI.output_folder,"left_tmp.png")
-            right_filepath=os.path.join(self.i3drsgmAppAPI.output_folder,"right_tmp.png")
-            disp_filepath=os.path.join(self.i3drsgmAppAPI.output_folder,"disparity.tif")
+            left_filepath=os.path.join(self.i3drsgmAppAPI.tmp_folder,"left_tmp.png")
+            right_filepath=os.path.join(self.i3drsgmAppAPI.tmp_folder,"right_tmp.png")
+            disp_filepath=os.path.join(self.i3drsgmAppAPI.tmp_folder,"disparity.tif")
             cv2.imwrite(left_filepath,left_img)
             cv2.imwrite(right_filepath,right_img)
             valid = self.i3drsgmAppAPI.forwardMatchFiles(left_filepath,right_filepath)

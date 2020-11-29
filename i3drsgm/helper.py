@@ -7,9 +7,6 @@ from i3drsgm import I3DRSGM, StereoSupport
 
 if __name__ == "__main__":
     # Get folder containing current script
-    i3drsgm_folder = os.path.dirname(i3drsgm.__file__)
-    app_folder = os.path.join(i3drsgm_folder,"app")
-    tmp_folder = os.path.join(i3drsgm_folder,"tmp")
     script_folder = os.path.dirname(os.path.realpath(__file__))
     resource_folder = os.path.join(script_folder,os.path.normpath("../sample_data"))
 
@@ -21,7 +18,7 @@ if __name__ == "__main__":
 
     # Initalise I3DRSGM
     print("Intitalising I3DRSGM...")
-    i3drsgm = I3DRSGM(tmp_folder,app_folder)
+    i3drsgm = I3DRSGM()
     if i3drsgm.isInit():
         # Load images from file
         left_img = cv2.imread(os.path.join(resource_folder,"sim_left.png"))
