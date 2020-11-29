@@ -46,6 +46,9 @@ class CleanCommand(Command):
 with open("../README.md", "r") as fh:
     long_description = fh.read()
 
+with open("../version.txt", "r") as fh:
+    version = fh.read()
+
 def str2bool(v):
     if isinstance(v, bool):
        return v
@@ -77,7 +80,7 @@ else:
 
 setup(
     name="i3drsgm",
-    version="1.0.6",
+    version=version,
     author="Ben Knight",
     author_email="bknight@i3drobotics.com",
     description="Python wrapper for I3DR Semi-Global Matcher",
