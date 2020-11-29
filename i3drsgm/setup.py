@@ -92,7 +92,7 @@ setup(
     include_package_data=INCLUDE_PACKAGE_DATA,
     install_requires=[
         'numpy; python_version == "3.5"','numpy==1.19.3; python_version > "3.5"',
-        'opencv-python','stereo3d',"wget"
+        'opencv-python','stereo3d >= 0.0.3',"wget"
     ],
     classifiers=[
         "Programming Language :: Python :: 3",

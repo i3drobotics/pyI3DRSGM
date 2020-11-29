@@ -1,6 +1,6 @@
 pytest
 wget
 opencv-python
-stereo3d
+stereo3d >= 0.0.3
 numpy; python_version == '3.5'
 numpy==1.19.3; python_version > '3.5'
