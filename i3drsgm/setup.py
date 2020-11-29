@@ -77,7 +77,7 @@ else:
 
 setup(
     name="i3drsgm",
-    version="1.0.6.1",
+    version="1.0.6.2",
     author="Ben Knight",
     author_email="bknight@i3drobotics.com",
     description="Python wrapper for I3DR Semi-Global Matcher",
