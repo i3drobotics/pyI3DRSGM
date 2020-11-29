@@ -9,7 +9,12 @@ mkdir release
 cd i3drsgm
 python -m pip install --upgrade pip
 python -m pip install setuptools wheel twine
-python -m pip install -r requirements.txt
+python -m pip install --upgrade -r requirements.txt --no-cache
+python -m pip install flake8 pytest
+
+pytest
+
+if %ERRORLEVEL% GEQ 1 EXIT /B 1
 
 python setup.py clean
 python setup.py bdist_wheel --plat-name=win-amd64 --offline-installer=false
