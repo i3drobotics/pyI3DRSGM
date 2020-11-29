@@ -1,4 +1,5 @@
 pytest
+wget
 opencv-python
 stereo3d
 numpy; python_version == '3.5'
