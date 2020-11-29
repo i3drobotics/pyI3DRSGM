@@ -7,6 +7,10 @@ rmdir /s /q release
 mkdir release
 
 cd i3drsgm
+python -m pip install --upgrade pip
+python -m pip install setuptools wheel twine
+python -m pip install -r requirements.txt
+
 python setup.py clean
 python setup.py bdist_wheel --plat-name=win-amd64 --offline-installer=false
 cd ..
