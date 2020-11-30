@@ -9,7 +9,7 @@ from setuptools import Command, setup, find_packages
 
 class CleanCommand(Command):
     """Custom clean command to tidy up the project root."""
-    CLEAN_FILES = './build ./dist ./*.pyc ./*.tgz ./*.egg-info ./__pycache__'.split(' ')
+    CLEAN_FILES = './i3drsgm/i3drsgm_app ./i3drsgm/tmp ./i3drsgm-* ./build ./dist ./*.pyc ./*.tgz ./*.egg-info ./__pycache__'.split(' ')
 
     # Support the "all" option. Setuptools expects it in some situations.
     user_options = [
