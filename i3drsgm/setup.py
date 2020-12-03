@@ -4,12 +4,14 @@ from shutil import rmtree
 import glob
 import sys
 import argparse
-from i3drsgm import I3DRSGMAppAPI
 from setuptools import Command, setup, find_packages
+from i3drsgm import I3DRSGMAppAPI
+
 
 class CleanCommand(Command):
     """Custom clean command to tidy up the project root."""
-    CLEAN_FILES = './i3drsgm/i3drsgm_app ./i3drsgm/tmp ./i3drsgm-* ./build ./dist ./*.pyc ./*.tgz ./*.egg-info ./__pycache__'.split(' ')
+    CLEAN_FILES = './i3drsgm/i3drsgm_app ./i3drsgm/tmp ./i3drsgm-*\
+        ./build ./dist ./*.pyc ./*.tgz ./*.egg-info ./__pycache__'.split(' ')
 
     # Support the "all" option. Setuptools expects it in some situations.
     user_options = [
@@ -19,7 +21,7 @@ class CleanCommand(Command):
 
     boolean_options = ['all']
 
-    def __init__(self,dist):
+    def __init__(self, dist):
         self.all = None
         super().__init__(dist)
 
@@ -38,23 +40,29 @@ class CleanCommand(Command):
             abs_paths = glob.glob(normpath(join(script_path, path_spec)))
             for path in [str(p) for p in abs_paths]:
                 if not path.startswith(script_path):
-                    # Die if path in CLEAN_FILES is absolute + outside this directory
-                    raise ValueError("%s is not a path inside %s" % (path, script_path))
+                    # Die if path in CLEAN_FILES
+                    # is absolute + outside this directory
+                    raise ValueError("%s is not a path inside %s" % (
+                        path, script_path))
                 print('removing %s' % relpath(path))
                 rmtree(path)
+
 
 with open("../README.md", "r") as fh:
     long_description = fh.read()
 
+
 with open("../version.txt", "r") as fh:
     version = fh.read()
 
-def str2bool(v):
-    if isinstance(v, bool):
-       return v
-    if v.lower() in ('yes', 'true', 't', 'y', '1'):
+
+def str2bool(bool_str):
+    """Convert string with boolean value to bool type"""
+    if isinstance(bool_str, bool):
+        return bool_str
+    if bool_str.lower() in ('yes', 'true', 't', 'y', '1'):
         return True
-    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
+    elif bool_str.lower() in ('no', 'false', 'f', 'n', '0'):
         return False
     else:
         raise argparse.ArgumentTypeError('Boolean value expected.')
@@ -65,7 +73,7 @@ def str2bool(v):
 # (can't work out how to change setuptools.setup arguments from a cmdclass)
 argparser = argparse.ArgumentParser(add_help=False)
 argparser.add_argument('--offline-installer', type=str2bool, default=False,
-                        help='required foo argument', required=False)
+                       help='required foo argument', required=False)
 args, unknown = argparser.parse_known_args()
 sys.argv = [sys.argv[0]] + unknown
 
@@ -88,11 +96,12 @@ setup(
     long_description_content_type="text/markdown",
     url="https://github.com/i3drobotics/pyi3drsgm",
     packages=find_packages(),
-    package_dir={'i3drsgm':'i3drsgm'},
+    package_dir={'i3drsgm': 'i3drsgm'},
     include_package_data=INCLUDE_PACKAGE_DATA,
     install_requires=[
-        'numpy; python_version == "3.5"','numpy==1.19.3; python_version > "3.5"',
-        'opencv-python','stereo3d >= 0.0.3',"wget"
+        'numpy; python_version == "3.5"',
+        'numpy==1.19.3; python_version > "3.5"',
+        'opencv-python', 'stereo3d >= 0.0.3', "wget"
     ],
     classifiers=[
         "Programming Language :: Python :: 3",
@@ -100,5 +109,5 @@ setup(
         "Operating System :: Microsoft :: Windows",
     ],
     python_requires='>=3.6',
-    cmdclass={'clean': CleanCommand }
+    cmdclass={'clean': CleanCommand}
 )
