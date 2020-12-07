@@ -6,7 +6,6 @@ set /p version=< version.txt
 rmdir /s /q release
 mkdir release
 
-
 python -m pip install --upgrade pip
 python -m pip install setuptools wheel twine
 python -m pip install flake8 pytest
