@@ -1,7 +1,7 @@
 """This module is used for manually testing functionality while developing i3drsgm module"""
 import os
 import cv2
-from Stereo3D import StereoCalibration
+from stereo3d.stereocalibration import StereoCalibration
 from i3drsgm import I3DRSGM, StereoSupport
 
 if __name__ == "__main__":
