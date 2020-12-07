@@ -293,7 +293,7 @@ class I3DRSGMAppAPI:
         self.init_success = valid
 
     @staticmethod
-    def download_app(i3drsgm_app_version="1.0.6", replace=False):
+    def download_app(i3drsgm_app_version="1.0.7", replace=False):
         def bar_progress(current, total, *_):
             """
             Progress bar to display download progress in wget
