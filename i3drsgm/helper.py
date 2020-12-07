@@ -1,6 +1,7 @@
 """This module is used for manually testing functionality while developing i3drsgm module"""
 import os
 import cv2
+import glob
 from stereo3d.stereocalibration import StereoCalibration
 from i3drsgm import I3DRSGM, StereoSupport
 
@@ -18,7 +19,11 @@ if __name__ == "__main__":
 
     # Initalise I3DRSGM
     print("Intitalising I3DRSGM...")
-    i3drsgm_inst = I3DRSGM()
+    license_files = glob.glob("*.lic")
+    if (len(license_files) <= 0):
+        raise Exception("Failed to find license file in script directory.")
+    license_file = license_files[0]
+    i3drsgm_inst = I3DRSGM(license_file)
     if i3drsgm_inst.isInit():
         # Load images from file
         left_img = cv2.imread(os.path.join(resource_folder, "sim_left.png"))
@@ -30,8 +35,10 @@ if __name__ == "__main__":
         Q = stcal.stereo_cal["q"]
 
         # Set matcher parameters
-        i3drsgm_inst.setDisparityRange(0)
+        i3drsgm_inst.setWindowSize(11)
+        i3drsgm_inst.setMinDisparity(0)
         i3drsgm_inst.setDisparityRange(3264)
+        i3drsgm_inst.setPyamidLevel(6)
         i3drsgm_inst.enableInterpolation(False)
 
         while(True):
