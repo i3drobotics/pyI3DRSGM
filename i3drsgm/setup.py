@@ -10,9 +10,9 @@ from i3drsgm import I3DRSGMAppAPI
 
 class CleanCommand(Command):
     """Custom clean command to tidy up the project root."""
-    CLEAN_FILES = './i3drsgm/i3drsgm_app ./i3drsgm/tmp ./i3drsgm-*\
-        ./build ./dist ./*.pyc ./*.tgz ./*.egg-info ./__pycache__'.split(' ')
-
+    CLEAN_FILES = './i3drsgm/i3drsgm_app ./i3drsgm/tmp ./i3drsgm-* '
+    CLEAN_FILES += './build ./dist ./*.pyc ./*.tgz ./*.egg-info ./__pycache__'
+    CLEAN_FILES = CLEAN_FILES.split(' ')
     # Support the "all" option. Setuptools expects it in some situations.
     user_options = [
         ('all', 'a',
