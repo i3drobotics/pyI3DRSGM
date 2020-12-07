@@ -238,6 +238,12 @@ class I3DRSGMAppAPI:
         self.PARAM_MIN_DISPARITY = "SET_MIN_DISPARITY"
         self.PARAM_DISPARITY_RANGE = "SET_DISPARITY_RANGE"
         self.PARAM_INTERPOLATION = "SET_INTERPOLATION"
+        self.PARAM_WINDOW_SIZE = "SET_WINDOW_SIZE"
+        self.PARAM_PYRAMID_LEVEL = "SET_PYRAMID_LEVEL"
+        self.param_list = [
+            self.PARAM_MIN_DISPARITY, self.PARAM_DISPARITY_RANGE,
+            self.PARAM_INTERPOLATION, self.PARAM_WINDOW_SIZE,
+            self.PARAM_WINDOW_SIZE, self.PARAM_PYRAMID_LEVEL]
 
         # Check for valid I3DRSGMApp install
         valid_i3drsgm_app = False
@@ -343,7 +349,7 @@ class I3DRSGMAppAPI:
             download_from_release(i3drsgm_app_version)
         else:
             if replace:
-                os.remove(i3drsgm_app_folder)
+                shutil.rmtree(i3drsgm_app_folder)
                 download_from_release(i3drsgm_app_version)
 
     def isInit(self):
@@ -418,9 +424,13 @@ class I3DRSGMAppAPI:
     def setParam(self, param, value):
         # Set algorithm parameter with api request
         if (self.init_success):
-            appOptions = param+","+str(value)
-            valid, _ = self.apiRequest(appOptions)
-            return valid
+            if param in self.param_list:
+                appOptions = param+","+str(value)
+                valid, _ = self.apiRequest(appOptions)
+                return valid
+            else:
+                print("Invalid param {}".format(param))
+                return False
         else:
             print("Failed to initalise the pyI3DRSGM class. Make sure to initalise the class 'i3rsgm = pyI3DRSGM(...'")
             print("Check valid initalisation with 'isInit' function. E.g. 'i3rsgm.isInit()'")
@@ -433,7 +443,9 @@ class I3DRSGMAppAPI:
 
 
 class I3DRSGM:
-    def __init__(self, license_file=None):
+    def __init__(self, license_file=None, replace_api=False):
+        if (replace_api):
+            I3DRSGMAppAPI.download_app(replace=True)
         # Initalse I3DRSGM
         # Initalise connection to I3DRSGM app API
         self.i3drsgmAppAPI = I3DRSGMAppAPI(license_file)
@@ -470,6 +482,28 @@ class I3DRSGM:
         if (self.isInit()):
             valid = self.i3drsgmAppAPI.setParam(
                 self.i3drsgmAppAPI.PARAM_DISPARITY_RANGE, value)
+            return valid
+        else:
+            print("Failed to initalise the pyI3DRSGM class. Make sure to initalise the class 'i3rsgm = pyI3DRSGM(...'")
+            print("Check valid initalisation with 'isInit' function. E.g. 'i3rsgm.isInit()'")
+            return False
+
+    def setWindowSize(self, value):
+        # Set disparity range used I3DRSGM algorithm
+        if (self.isInit()):
+            valid = self.i3drsgmAppAPI.setParam(
+                self.i3drsgmAppAPI.PARAM_WINDOW_SIZE, value)
+            return valid
+        else:
+            print("Failed to initalise the pyI3DRSGM class. Make sure to initalise the class 'i3rsgm = pyI3DRSGM(...'")
+            print("Check valid initalisation with 'isInit' function. E.g. 'i3rsgm.isInit()'")
+            return False
+
+    def setPyamidLevel(self, value):
+        # Set disparity range used I3DRSGM algorithm
+        if (self.isInit()):
+            valid = self.i3drsgmAppAPI.setParam(
+                self.i3drsgmAppAPI.PARAM_PYRAMID_LEVEL, value)
             return valid
         else:
             print("Failed to initalise the pyI3DRSGM class. Make sure to initalise the class 'i3rsgm = pyI3DRSGM(...'")
