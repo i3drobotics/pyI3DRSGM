@@ -3,7 +3,10 @@ Sample: Test I3DRSGM functionality
 """
 import os
 import cv2
-from Stereo3D import StereoCalibration
+import numpy as np
+import pandas as pd
+from pyntcloud import PyntCloud
+from stereo3d.stereocalibration import StereoCalibration
 import i3drsgm
 from i3drsgm import I3DRSGM, StereoSupport
 
@@ -32,9 +35,9 @@ if i3drsgm_inst.isInit():
     Q = stcal.stereo_cal["q"]
 
     # Set matcher parameters
-    i3drsgm.setDisparityRange(0)
-    i3drsgm.setDisparityRange(3264)
-    i3drsgm.enableInterpolation(False)
+    i3drsgm_inst.setDisparityRange(0)
+    i3drsgm_inst.setDisparityRange(3264)
+    i3drsgm_inst.enableInterpolation(False)
 
     while True:
         # Rectify stereo image pair
@@ -42,7 +45,7 @@ if i3drsgm_inst.isInit():
             left_gray_img, right_gray_img)
         # Stereo match image pair
         print("Running I3DRSGM on images...")
-        valid, disp = i3drsgm.forwardMatch(left_rect_img, right_rect_img)
+        valid, disp = i3drsgm_inst.forwardMatch(left_rect_img, right_rect_img)
         if valid:
             # Downsample disparity image for faster processing
             # Downsample rate is passed through to '
@@ -64,8 +67,30 @@ if i3drsgm_inst.isInit():
             cv2.imshow("display", disp_colormap_resized)
 
             # Calculate depth from disparity
-            depth = StereoSupport.depth_from_disp(
+            depth = StereoSupport.reprojectImageTo3D(
                 disp_resize, Q, downsample_rate)
+            
+            # Convert gray image to rgb to use as colors in point cloud
+            image = cv2.cvtColor(left_rect_img, cv2.COLOR_GRAY2RGB)
+            
+            # Convert image to float32 to match depth data type
+            image = np.float32(image)
+            image = image/255
+            
+            # Reshape image and depth to list all points rather be the size of the image
+            image = image.reshape(-1, 3)
+            depth = depth.reshape(-1, 3)
+            
+            # Combine image colors and depth points
+            points = np.hstack((depth, image))
+            
+            # Generate point cloud
+            cloud = PyntCloud(pd.DataFrame(
+                # same arguments that you are passing to visualize_pcl
+                data=points,
+                columns=["x", "y", "z", "red", "green", "blue"]))
+            # Save point cloud to file
+            cloud.to_file(os.path.join(script_folder, "sim.ply"))
 
             print("Press any key on image window to close")
             cv2.waitKey(0)
